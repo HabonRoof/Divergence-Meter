@@ -3,6 +3,8 @@ This repository use Atmega328P and some classic TTL ICs to build a nixie tube cl
 
 ## Video on Youtube
 
+https://youtu.be/shoaHO1Cq2g
+
 # Material needed
 
 # How to use
