@@ -168,6 +168,17 @@ void digit_update(int num) {
   }
 }
 
+void nixie_cathod_depoison() {
+  if ((time_counter % 300) == 0) {
+    cathod_counter ++;
+    if (time_counter > 33000)
+      time_counter = 0;
+  }
+  tubeupdate( cathod_counter, cathod_counter, cathod_counter, cathod_counter, cathod_counter, cathod_counter, cathod_counter, cathod_counter);
+  if (cathod_counter == 12)
+    cathod_counter = 0;
+}
+
 /*
    Clock function
 */
@@ -183,7 +194,7 @@ void nixie_clock_yrdate() {
 }
 
 void nixie_clock_time() {
-  // Devide the time data into digit data
+  // Divide the time data into digit data
   byte hour10 = hour / 10;
   byte hour1 = hour % 10;
   byte minute10 = minute / 10;
@@ -203,7 +214,7 @@ void divergence_meter() {
     random_display();
     random_count++;
     if (random_count == random_time) {
-      random0 = random(2);  //1
+      random0 = random(2);  //only 1 or 0
       random1 = 10; //.
       //random2 = 0;  //0
       //random3 = 4;  //4
@@ -216,9 +227,65 @@ void divergence_meter() {
   tubeupdate(random0, random1, random2, random3, random4, random5, random6, random7);
 }
 
-void nixie_sleep(){
-    digitalWrite(tube_a, LOW);
-    digitalWrite(tube_b, LOW);
-    digitalWrite(tube_c, LOW);
-    digitalWrite(tube_EN, LOW);
+void nixie_sleep() {
+  digitalWrite(tube_a, LOW);
+  digitalWrite(tube_b, LOW);
+  digitalWrite(tube_c, LOW);
+  digitalWrite(tube_EN, LOW);
+}
+
+
+void blink_tube(byte tubes_binary_number, int blink_duration) {
+  unsigned long oldMicros_for_time_setup = 0;;
+  if (micros() >= oldMicros_for_time_setup) {
+    oldMicros_for_time_setup = micros() + 500;
+    if (tube == 0) {
+      digitalWrite(tube_a, LOW);
+      digitalWrite(tube_b, LOW);
+      digitalWrite(tube_c, LOW);
+      digitalWrite(tube_EN, HIGH);
+    }
+    if (tube == 1) {
+      digitalWrite(tube_a, HIGH);
+      digitalWrite(tube_b, LOW);
+      digitalWrite(tube_c, LOW);
+      digitalWrite(tube_EN, HIGH);
+    }
+    if (tube == 2) {
+      digitalWrite(tube_a, LOW);
+      digitalWrite(tube_b, HIGH);
+      digitalWrite(tube_c, LOW);
+      digitalWrite(tube_EN, HIGH);
+    }
+    if (tube == 3) {
+      digitalWrite(tube_a, HIGH);
+      digitalWrite(tube_b, HIGH);
+      digitalWrite(tube_c, LOW);
+      digitalWrite(tube_EN, HIGH);
+    }
+    if (tube == 4) {
+      digitalWrite(tube_a, LOW);
+      digitalWrite(tube_b, LOW);
+      digitalWrite(tube_c, HIGH);
+      digitalWrite(tube_EN, HIGH);
+    }
+    if (tube == 5) {
+      digitalWrite(tube_a, HIGH);
+      digitalWrite(tube_b, LOW);
+      digitalWrite(tube_c, HIGH);
+      digitalWrite(tube_EN, HIGH);
+    }
+    if (tube == 6) {
+      digitalWrite(tube_a, LOW);
+      digitalWrite(tube_b, HIGH);
+      digitalWrite(tube_c, HIGH);
+      digitalWrite(tube_EN, HIGH);
+    }
+    if (tube == 7) {
+      digitalWrite(tube_a, HIGH);
+      digitalWrite(tube_b, HIGH);
+      digitalWrite(tube_c, HIGH);
+      digitalWrite(tube_EN, HIGH);
+    }
+  }
 }

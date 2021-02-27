@@ -10,9 +10,21 @@
 
    Include DS1302 for DS1302 RTC clock
    Resource:https://github.com/msparks/arduino-ds1302
+
+   Updated: 2021/02/27
+   Note:
+   1.Fix the millis() overflow problem, by using minus calculation
+     Please reference https://www.norwegiancreations.com/2018/10/arduino-tutorial-avoiding-the-overflow-issue-when-using-millis-and-micros/
+   2.Add prevent "Cathod poison" function throught display each digit at each tube, the function named nixie_cathod_depoision()
+   3.Add night sleep mode
+   4.Add random display mode after 5 minute sleep. Each random function will reset after next 5 minute.
+     The random function will display for only 5 second.
+     But if you hit the button 1 anytime, the last_active_time will update to re-calculate the nest wakeup time.
+
+   Issues:
+   DS1302 will ahead about 30 minutes per year. This maybe caused by the crystal effect by ambient temperature.(Taiwan sometime has 32-33 degree Celcius)
 */
 
-#include <stdio.h>
 #include <DS1302.h>
 
 // ============================== namespace ===========================
@@ -110,12 +122,12 @@ byte random7;
 int random_count = 0;
 int random_time = 400;
 int duration = 1000;
-
+int time_counter = 0;
 /*
    tube counter to know whitch tube is light up now
 */
 byte tube = 0;
-
+byte cathod_counter = 0;
 /*
    Use oldMicros to verify the delay function, but more accurate
 
@@ -131,6 +143,8 @@ void nixie_clock_yrdate();
 void nixie_clock_time();
 void divergence_meter();
 void nixie_sleep();
+void tube_update();
+void nixie_cathod_depoison();
 
 
 void setup() {
@@ -155,7 +169,7 @@ void setup() {
   rtc.writeProtect(false);
   rtc.halt(false);
   // Make a new time object to set the date and time.
-  //Time t(2020, 2, 25, 23, 38, 50, Time::kFriday);
+  //Time t(2021, 2, 27, 16, 40, 00, Time::kSaturday);
   // Set the time and date on the chip.
   //rtc.time(t);
 
@@ -169,8 +183,22 @@ void setup() {
 void loop() {
   if (micros() >= oldMicros) {
     oldMicros = micros() + duration;
-    if(millis()>=last_active_time+300000)
-      display_mode = 3;
+
+    if (((millis() - last_active_time) > 5000) && ((millis() - last_active_time) < 300000)) {
+      display_mode = 4;
+      //Serial.println("Auto Sleep");
+    }
+
+    if ((millis() - last_active_time) >= 300000) {
+      last_active_time = millis();
+      byte random_mode = random(5);
+      display_mode = random_mode;
+      //Serial.println("Random Mode");
+    }
+    if (hour < 10 || hour > 22) {
+      display_mode = 4;
+      //Serial.println("Periodic sleep");
+    }
     /*
        We have three modes to display, divergence, time and date. Use button 1 to change display mode
     */
@@ -180,7 +208,7 @@ void loop() {
       bt1_release = false;
       //Serial.print("Display Mode is :");
       //Serial.println(display_mode);
-      if (display_mode > 2)
+      if (display_mode > 4)
         display_mode = 0;
     }
 
@@ -188,27 +216,31 @@ void loop() {
       bt1_release = true;
 
     switch (display_mode) {
+      case 0:
+        nixie_clock_time();
+        //Serial.println("Time");
+        break;
+      case 1:
+        nixie_clock_yrdate();
+        //Serial.println("Date");
+        break;
       case 2:
         if (digitalRead(button_2) == 0) {
           random_count = 0;
         }
         divergence_meter();
         //Serial.println("Divergence");
-
-        break;
-      case 0:
-        nixie_clock_time();
-        // Serial.println("Time");
-        break;
-      case 1:
-        nixie_clock_yrdate();
-        //Serial.println("Date");
         break;
       case 3:
+        nixie_cathod_depoison();
+        //Serial.println("Depoison");
+        break;
+      case 4:
         nixie_sleep();
+        //Serial.println("Sleep");
         break;
       default:
-        nixie_clock_time();
+        nixie_sleep();
         //Serial.println("Default case");
         break;
 
@@ -217,5 +249,6 @@ void loop() {
     if (tube > 7)
       tube = 0;
     time_update();
+    time_counter++;
   }
 }
