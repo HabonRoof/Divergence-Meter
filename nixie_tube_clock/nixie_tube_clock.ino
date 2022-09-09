@@ -122,7 +122,7 @@ byte random7;
 int random_count = 0;
 int random_time = 400;
 int duration = 1000;
-int time_counter = 0;
+long time_counter = 0;
 /*
    tube counter to know whitch tube is light up now
 */
@@ -184,7 +184,7 @@ void loop() {
   if (micros() >= oldMicros) {
     oldMicros = micros() + duration;
 
-    if (((millis() - last_active_time) > 5000) && ((millis() - last_active_time) < 300000)) {
+    if (((millis() - last_active_time) > 15000) && ((millis() - last_active_time) < 300000)) {
       display_mode = 4;
       //Serial.println("Auto Sleep");
     }
@@ -195,7 +195,7 @@ void loop() {
       display_mode = random_mode;
       //Serial.println("Random Mode");
     }
-    if (hour < 10 || hour > 22) {
+    if (hour < 7 ) {
       display_mode = 4;
       //Serial.println("Periodic sleep");
     }
