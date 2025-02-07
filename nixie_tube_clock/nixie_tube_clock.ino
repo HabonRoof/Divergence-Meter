@@ -189,7 +189,7 @@ void loop() {
       //Serial.println("Auto Sleep");
     }
 
-    if ((millis() - last_active_time) >= 300000) {
+    if ((millis() - last_active_time) >= 600000) {
       last_active_time = millis();
       byte random_mode = random(5);
       display_mode = random_mode;
