@@ -89,4 +89,4 @@ You can find the schematic on EASYEDA here: https://easyeda.com/Johnson35762/div
 
 # Tutorial on personal website
 
-You can also find the Trandition Chinese tutorial on my personal website : https://sites.google.com/ntut.org.tw/habonroofplayground-zh/arduino/%E4%B8%96%E7%95%8C%E7%B7%9A%E8%AE%8A%E5%8B%95%E7%8E%87%E8%A7%80%E6%B8%AC%E5%84%80
+You can also find the Trandition Chinese tutorial on my personal website : https://www.habonroof-playground.com/2022/11/blog-post.html

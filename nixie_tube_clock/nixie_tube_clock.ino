@@ -169,9 +169,9 @@ void setup() {
   rtc.writeProtect(false);
   rtc.halt(false);
   // Make a new time object to set the date and time.
-  //Time t(2021, 2, 27, 16, 40, 00, Time::kSaturday);
+  Time t(2024, 2, 7, 22, 03, 00, Time::kFriday);
   // Set the time and date on the chip.
-  //rtc.time(t);
+  rtc.time(t);
 
 }
 
@@ -184,7 +184,7 @@ void loop() {
   if (micros() >= oldMicros) {
     oldMicros = micros() + duration;
 
-    if (((millis() - last_active_time) > 15000) && ((millis() - last_active_time) < 300000)) {
+    if (((millis() - last_active_time) > 30000) && ((millis() - last_active_time) < 600000)) {
       display_mode = 4;
       //Serial.println("Auto Sleep");
     }
@@ -195,7 +195,15 @@ void loop() {
       display_mode = random_mode;
       //Serial.println("Random Mode");
     }
-    if (hour < 7 ) {
+    if (hour < 7) {
+      display_mode = 4;
+      //Serial.println("Periodic sleep");
+    }
+    else if (hour > 12 && hour < 18) {
+      display_mode = 4;
+      //Serial.println("Periodic sleep");
+    }
+    else if (hour > 23){
       display_mode = 4;
       //Serial.println("Periodic sleep");
     }
